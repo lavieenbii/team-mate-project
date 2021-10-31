@@ -1,0 +1,83 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"
+        integrity="sha512-gc3xjCmIy673V6MyOAZhIW93xhM9ei1I+gLbmFjUHIjocENRsLX/QUE1htk5q1XV2D/iie/VQ8DXI6Vu8bexvQ=="
+        crossorigin="anonymous" referrerpolicy="no" />
+    </head>
+
+    <body>
+        <h1>Masukkan misi</h1>
+        <br>
+        <form action = "/misi" method="post">
+            Nama Misi: <input type="text" name="namaMisi">
+            <br>
+            GeoJSON: <input type="text" name="geoJSON">
+            <br>
+            <button type="submit">Submit</button>
+        </form>
+
+        <button type="submit" onclick="saveToDatabase()">Save Mission</button>
+
+        <div id="map" style="height: 500px;"></div>
+        <br>
+        <h1>Misi yang tersedia</h1>
+        <ul id='listMisi'></ul>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"
+        integrity="sha512-ozq8xQKq6urvuU6jNgkfqAmT7jKN2XumbrX1JiB3TnF7tI48DPI4Gy1GXKD/V3EExgAs1V+pRO7vwtS1LHg0Gw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        <script>
+            fetch('/misi')
+                .then(data => {
+                    data.json().then(resp => {
+                        resp.forEach(element => {
+                            console.log(element)
+                            $('#listMisi').append(`<li>${element.planName}, <a href="/misi/delete/${element.planId}">Hapus</a></li>`)
+                        });                        
+                    })
+                })
+
+            var map = L.map('map')
+                .setView([-7.770398086343634, 110.37753582000731], 17);
+                L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            var editableLayers = new L.FeatureGroup();
+            map.addLayer(editableLayers);
+            var drawControl = new L.Control.Draw({
+                edit: {
+                    featureGroup: editableLayers
+                }
+            });
+            map.addControl(drawControl);
+            map.on(L.Draw.Event.CREATED, function(event) {
+                editableLayers.addLayer(event.layer);
+            });
+
+            function saveToDatabase() {
+                let namaMisi = prompt("Nama Misi:");
+                $.post(
+                    '/misi', {
+                        namaMisi: (namaMisi),
+                        geoJSON: JSON.stringify(editableLayers.toGeoJSON())
+                    } 
+                )
+            }
+            
+        </script>
+    </body>
+    
+</html>
