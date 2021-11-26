@@ -6,25 +6,46 @@
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"
         integrity="sha512-gc3xjCmIy673V6MyOAZhIW93xhM9ei1I+gLbmFjUHIjocENRsLX/QUE1htk5q1XV2D/iie/VQ8DXI6Vu8bexvQ=="
-        crossorigin="anonymous" referrerpolicy="no" />
+        crossorigin="anonymous" referrerpolicy="no" />        
     </head>
 
+    <header>
+        <b><div className="Head-comp">Ground Control Station</div></b>
+    </header>
+
     <body>
-        <h1>Masukkan misi</h1>
-        <br>
-        <form action = "/misi" method="post">
-            Nama Misi: <input type="text" name="namaMisi">
-            <br>
-            GeoJSON: <input type="text" name="geoJSON">
-            <br>
-            <button type="submit">Submit</button>
-        </form>
-
-        <button type="submit" onclick="saveToDatabase()">Save Mission</button>
-
+        <h1>Create Your Mission</h1>
+        <h4>Make your own mission plane by draw it in the map</h4>
         <div id="map" style="height: 500px;"></div>
+        <button type="submit" onclick="saveToDatabase()">Create</button>
+        <h1>List Mission</h1>
+        <h4>Here are your missions that have been created before</h4>
+        <table cellPadding ="10" width="100%">
+          <thead>
+            <tr>
+              <th scope="col">id</th>
+              <th scope="col">Mission name</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <td>1</td>
+                <td>Fly to Wisdom Park</td>
+                <td>
+                  <button>Delete</button>
+                </td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Random Flight</td>
+                <td>
+                  <button>Delete</button>
+                </td>
+              </tr>
+          </tbody>
+        </table>       
         <br>
-        <h1>Misi yang tersedia</h1>
         <ul id='listMisi'></ul>
 
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"
@@ -81,3 +102,39 @@
     </body>
     
 </html>
+
+<style>
+
+
+header {
+  background-color: #76D6DC;
+  height: 60px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: left;
+  font-size: calc(10px + 2vmin);
+  color: black;
+  text-align: center;
+}
+  
+.Head-comp {
+  padding: 0 20px;
+}
+  
+  
+h4 {
+  color: #999999;
+}
+  
+button {
+  background-color: #76D6DC;
+  color: black;
+  width: 90px;
+  height: 40px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 15px;
+}
+</style>
