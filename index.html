@@ -1,0 +1,169 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"
+        integrity="sha512-gc3xjCmIy673V6MyOAZhIW93xhM9ei1I+gLbmFjUHIjocENRsLX/QUE1htk5q1XV2D/iie/VQ8DXI6Vu8bexvQ=="
+        crossorigin="anonymous" referrerpolicy="no" />        
+    </head>
+
+    <header>
+        <b><div className="Head-comp">Ground Control Station</div></b>
+    </header>
+
+    <body>
+        <h1>Create Your Mission</h1>
+        <br>
+        <form action="/misi" method="post">
+          Nama Misi : <input type="text" name="namaMisi">
+          <br>
+          GeoJSON: <input type="text" name="geoJSON">
+          <br>
+          <button type="submit">submit</button>
+        </form>
+        <h4>Make your own mission plane by draw it in the map</h4>
+        <div id="map" style="height: 500px;"></div>
+        <button type="submit" onclick="saveToDatabase()">Create</button>
+        <h1>List Mission</h1>
+        <h4>Here are your missions that have been created before</h4>
+
+        <div id>
+          <table cellPadding="10" width="100%">
+            <thead>
+              <tr>
+                <th scope="col">id</th>
+                <th scope="col">Mission name</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="listMisi">1</td>
+                <td>Fly to Wisdom Park</td>
+                <td>
+                  <button type="submit" onclick="deleteFromDatabase()">Delete</button>
+                </td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Random Flight</td>
+                <td>
+                  <button>Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+             
+        <br>
+        <!-- <button type="submit" onclick="getMission()">Show Mission</button> -->
+        <!-- <ul id='listMisi'></ul>  -->
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"
+        integrity="sha512-ozq8xQKq6urvuU6jNgkfqAmT7jKN2XumbrX1JiB3TnF7tI48DPI4Gy1GXKD/V3EExgAs1V+pRO7vwtS1LHg0Gw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        <script>
+            fetch('/misi')
+                .then(data => {
+                  data.json().then(resp => {
+                    resp.forEach(element => {
+                      console.log(element)
+                      $('#listMisi').append(`<div>${element.planName}, <a href="/misi/delete/${element.planId}">Hapus</a></div><a href="/misi/update/${element.planId}">Update</a></div> `)
+                    });
+                  })
+                })
+
+            var map = L.map('map')
+                .setView([-7.770398086343634, 110.37753582000731], 17);
+                L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            var editableLayers = new L.FeatureGroup();
+            map.addLayer(editableLayers);
+            var drawControl = new L.Control.Draw({
+                edit: {
+                    featureGroup: editableLayers
+                }
+            });
+            map.addControl(drawControl);
+            map.on(L.Draw.Event.CREATED, function(event) {
+                editableLayers.addLayer(event.layer);
+            });
+
+            function saveToDatabase() {
+                let namaMisi = prompt("Nama Misi:");
+                $.post(
+                    '/misi', {
+                        namaMisi: (namaMisi),
+                        geoJSON: JSON.stringify(editableLayers.toGeoJSON()),
+                    } 
+                )
+            }
+
+            function deleteFromDatabase() {
+              const deleteMisi =  confirm("Are you sure to delete");
+                $.post(
+                  '/delete',
+                  (data) => {
+                    if(data ==='OK'){
+                      '/misi/delete/:id';
+                    }else{
+                      alert('failed to delete')
+                    }
+                  }
+                )
+              }
+
+
+            
+        </script>
+    </body>
+    
+</html>
+
+<style>
+
+
+header {
+  background-color: #76D6DC;
+  height: 60px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: left;
+  font-size: calc(10px + 2vmin);
+  color: black;
+  text-align: center;
+}
+  
+.Head-comp {
+  padding: 0 20px;
+}
+  
+  
+h4 {
+  color: #999999;
+}
+  
+button {
+  background-color: #76D6DC;
+  color: black;
+  width: 90px;
+  height: 40px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 15px;
+}
+</style>
