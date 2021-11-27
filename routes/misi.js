@@ -46,15 +46,15 @@ router.get("/delete/:id", function (req, res) {
 });
 
 //edit a mission
-router.get("/update", function (rec, res) {
-  let id = req.params.id;
-  db.run(`UPDATE (planName, g3wp) FROM MissionPlan VALUE(?,?)`, (err) => {
-    if (err) {
-      console.log(err);
-      res.status(500).send({ prompt: "error" });
-      return;
-    }
-    res.status(200).send({ status: "mission update" });
-  });
-});
+// router.get("/update", function (rec, res) {
+//   let id = req.params.id;
+//   db.run(`UPDATE (planName, g3wp) FROM MissionPlan VALUE(?,?)`, (err) => {
+//     if (err) {
+//       console.log(err);
+//       res.status(500).send({ prompt: "error" });
+//       return;
+//     }
+//     res.status(200).send({ status: "mission update" });
+//   });
+// });
 module.exports = router;
